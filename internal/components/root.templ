@@ -1,0 +1,36 @@
+package components
+
+import "github.com/Khaym03/invoces-service/internal/models"
+
+css font() {
+	font-family: sans-serif;
+}
+
+css FloatLeft() {
+	float: left;
+}
+
+css WFull() {
+	width: 100%;
+}
+
+css Clear() {
+	clear: both;
+}
+
+css Border() {
+    border: 2px black solid;
+}
+
+templ Root(data models.InvoiceDescription) {
+	<table class={ font(), Border() }>
+		<tr class={ FloatLeft(), WFull() }>
+			<td class={WFull()}>
+				@CompanyContact()
+			</td>
+			<td>
+				@InvoiceDescription(data)
+			</td>
+		</tr>
+	</table>
+}

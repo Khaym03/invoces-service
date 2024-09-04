@@ -1,0 +1,23 @@
+package components
+
+import "github.com/Khaym03/invoces-service/internal/models"
+import "strconv"
+
+css style() {
+    background-color: white;
+}
+
+css spacing() {
+    margin-top: 4px;
+}
+
+
+templ InvoiceDescription(data models.InvoiceDescription) {
+    
+    <span class={style(), FloatLeft()}>
+        <p>Factura #{strconv.FormatInt(data.Id, 10)}</p>
+        <p>Fecha de la factura: {data.Date.Format("Jan 02, 2006")}</p>
+        <p class={spacing()}>fecha de vencimiento: {data.DueDate.Format("Jan 02, 2006")}</p>
+        <p class={spacing()}>deuda total: ${strconv.FormatFloat(data.TotalDue, 'f', -2, 64)}</p>
+    </span>
+}
