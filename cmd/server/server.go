@@ -20,6 +20,9 @@ func main() {
 	}
 
 	http.Handle("/", templ.Handler(components.Root(description)))
+	http.HandleFunc("/x", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "generate/x.html")
+	})
 
 	fmt.Println("Listening on :3000")
 	http.ListenAndServe(":3000", nil)

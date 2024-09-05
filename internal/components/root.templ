@@ -19,18 +19,22 @@ css Clear() {
 }
 
 css Border() {
-    border: 2px black solid;
+	border: 2px black solid;
 }
 
 templ Root(data models.InvoiceDescription) {
-	<table class={ font(), Border() }>
-		<tr class={ FloatLeft(), WFull() }>
-			<td class={WFull()}>
-				@CompanyContact()
-			</td>
-			<td>
-				@InvoiceDescription(data)
-			</td>
-		</tr>
-	</table>
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+			<title>HTML 5 Boilerplate</title>
+			<link rel="stylesheet" type="text/css" href="/assets/css/output.css"/>
+		</head>
+		<body class="bg-red-500">
+			@CompanyContact()
+			@InvoiceDescription(data)
+		</body>
+	</html>
 }

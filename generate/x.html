@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factura</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 80%;
+            margin: 40px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .details {
+            margin-bottom: 20px;
+        }
+        .details p {
+            margin-bottom: 10px;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .table th {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Factura</h1>
+        </div>
+        <div class="details">
+            <p><strong>Fecha:</strong> {{ .Fecha }}</p>
+            <p><strong>Cliente:</strong> {{ .Cliente }}</p>
+            <p><strong>Dirección:</strong> {{ .Direccion }}</p>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Descripción</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range .Items }}
+                <tr>
+                    <td>{{ .Descripcion }}</td>
+                    <td>{{ .Cantidad }}</td>
+                    <td>{{ .PrecioUnitario }}</td>
+                    <td>{{ .Total }}</td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

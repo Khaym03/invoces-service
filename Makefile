@@ -10,6 +10,11 @@ brow:
 refresh:
 	@templ generate
 
+build-css:
+	npx tailwindcss -i ./assets/css/styles.css -o ./assets/css/output.css
+
+.PHONY: build-css
+
 # Default target
 all: refresh  pdf
 
