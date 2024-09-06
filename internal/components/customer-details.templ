@@ -1,0 +1,14 @@
+package components
+
+import "github.com/Khaym03/invoces-service/internal/models"
+
+// hughes.brian&#64;company.com
+
+templ CustomerDetails(c models.CustomerDetails) {
+	<div class="text-sm mt-8">
+		<div class="text-xl font-medium">{c.FullName}</div>
+		<div>{c.Address}</div>
+		<div>{c.Email}</div>
+		<div>{c.PhoneNumber}</div>
+	</div>
+}

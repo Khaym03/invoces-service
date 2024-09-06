@@ -22,7 +22,7 @@ css Border() {
 	border: 2px black solid;
 }
 
-templ Root(data models.InvoiceDescription) {
+templ Root(data models.InvoiceInput) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -32,9 +32,22 @@ templ Root(data models.InvoiceDescription) {
 			<title>HTML 5 Boilerplate</title>
 			<link rel="stylesheet" type="text/css" href="/assets/css/output.css"/>
 		</head>
-		<body class="bg-red-500">
-			@CompanyContact()
-			@InvoiceDescription(data)
+		<body class="flex justify-center items-center">
+			<div class="flex flex-col w-[816px] h-[1056px] border-2 p-10">
+				// <img src="http://localhost:3000/assets/images/logo_blanco.png" alt="brand-logo" width="551" height="483" class="max-w-[120px] filter invert "/>
+				<header class="flex items-start justify-between w-full">
+					@InvoiceDescription(data.InvoiceDetails)
+					@CompanyContact()
+				</header>
+
+				@CustomerDetails(data.CustomerDetails)
+
+				@ServicesTable()
+
+				@DetailedCharge()
+
+				@Footer()
+			</div>
 		</body>
 	</html>
 }

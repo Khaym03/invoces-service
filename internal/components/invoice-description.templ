@@ -1,23 +1,27 @@
 package components
 
-import "github.com/Khaym03/invoces-service/internal/models"
-import "strconv"
+import (
+	"github.com/Khaym03/invoces-service/internal/models"
+	"strconv"
+)
 
 css style() {
-    background-color: white;
+	background-color: white;
 }
 
 css spacing() {
-    margin-top: 4px;
+	margin-top: 4px;
 }
 
-
-templ InvoiceDescription(data models.InvoiceDescription) {
-    
-    <span class={style(), FloatLeft()}>
-        <p>Factura #{strconv.FormatInt(data.Id, 10)}</p>
-        <p>Fecha de la factura: {data.Date.Format("Jan 02, 2006")}</p>
-        <p class={spacing()}>fecha de vencimiento: {data.DueDate.Format("Jan 02, 2006")}</p>
-        <p class={spacing()}>deuda total: ${strconv.FormatFloat(data.TotalDue, 'f', -2, 64)}</p>
-    </span>
+templ InvoiceDescription(data models.InvoiceDetails) {
+	<div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+		<div class="text-2xl tracking-tight text-slate-600">Factura</div>
+		<div class="text-2xl">#{ strconv.FormatInt(data.Id, 10) }</div>
+		<div class="font-medium tracking-tight text-slate-600">FECHA DE FACTURACIÓN</div>
+		<div class="font-medium">{ data.Date.Format("Jan 02, 2006") }</div>
+		<div class="font-medium tracking-tight text-slate-600">FECHA DE VENCIMIENTO</div>
+		<div class="font-medium">{ data.Date.Format("Jan 02, 2006") }</div>
+		<div class="font-medium tracking-tight text-slate-600">TOTAL ADEUDADO</div>
+		<div class="font-medium">$235,000.00</div>
+	</div>
 }

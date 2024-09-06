@@ -24,13 +24,17 @@ func main() {
 
 	})
 
+	dir, _ := os.Getwd()
+
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir(filepath.Join(dir, "assets")))))
+
 	http.HandleFunc("/generate", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Solo se permiten solicitudes POST", http.StatusBadRequest)
 			return
 		}
 
-		var invoice models.InvoiceDescription
+		var invoice models.InvoiceInput
 		err := json.NewDecoder(r.Body).Decode(&invoice)
 		if err != nil {
 			http.Error(w, "Error al decodificar el cuerpo de la solicitud", http.StatusBadRequest)
@@ -48,7 +52,7 @@ func main() {
 			return
 		}
 
-		_, buf := PdfTest()
+		_, buf := PdfTest(invoice)
 
 		err = os.WriteFile(folder, buf.Bytes(), 0644)
 		if err != nil {
@@ -77,8 +81,15 @@ func PrintToPDF(urlstr string, res *[]byte) chromedp.Tasks {
 	return chromedp.Tasks{
 		chromedp.Navigate(urlstr),
 		chromedp.ActionFunc(func(ctx context.Context) error {
+			params := page.PrintToPDF().
+				WithMarginTop(0).
+				WithMarginBottom(0).
+				WithMarginLeft(0).
+				WithMarginRight(0).
+				WithPrintBackground(true)
+
 			// Generar el PDF con fondo transparente (opcional)
-			buf, _, err := page.PrintToPDF().WithPrintBackground(false).Do(ctx)
+			buf, _, err := params.Do(ctx)
 			if err != nil {
 				return err
 			}
@@ -108,17 +119,22 @@ func PrintToPDFFromHTML(htmlContent string, res *[]byte) chromedp.Tasks {
 	}
 }
 
-func PdfTest() (string, bytes.Buffer) {
+func PdfTest(i models.InvoiceInput) (string, bytes.Buffer) {
 	var buf bytes.Buffer
 
-	description := models.InvoiceDescription{
-		Id:       123123,
-		Date:     time.Now(),
-		DueDate:  time.Now(),
-		TotalDue: 50.00,
-	}
+	// description := models.InvoiceDetails{
+	// 	Id:       123123,
+	// 	Date:     time.Now(),
+	// 	DueDate:  time.Now(),
+	// 	TotalDue: 50.00,
+	// }
 
-	root := components.Root(description)
+	// invoice := models.InvoiceInput{
+	// 	InvoiceDetails:  ,
+	// 	CostumerDetails: models.CostumerDetails{},
+	// }
+
+	root := components.Root(i)
 
 	root.Render(context.Background(), &buf)
 
@@ -190,13 +206,13 @@ func GeneratePDF(filename string) {
 		return
 	}
 
-	// Guardar el PDF
-	pdfFilename := fmt.Sprintf("invoice-%d.pdf", time.Now().UnixNano())
+	// Guardar el PDF en el directorio predeterminado
+	pdfFilename := filepath.Join("generated-pdf", fmt.Sprintf("invoice-%d.pdf", time.Now().UnixNano()))
 	err = os.WriteFile(pdfFilename, buf, 0644)
 	if err != nil {
-		log.Println("Error al escribir el PDF:", err)
+		log.Printf("Error al escribir el PDF en %s: %v", "generated-pdf", err)
 		return
 	}
 
-	fmt.Println("PDF generado con éxito:", pdfFilename)
+	fmt.Printf("PDF generado con éxito: %s\n", pdfFilename)
 }

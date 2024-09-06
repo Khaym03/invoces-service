@@ -19,3 +19,9 @@ build-css:
 all: refresh  pdf
 
 .PHONY: all  refresh  pdf
+
+
+# Nuevo objetivo que incluye refresh, build-css y brow
+dev: refresh build-css brow
+
+
