@@ -1,6 +1,6 @@
 module github.com/Khaym03/invoces-service
 
-go 1.22.2
+go 1.23.1
 
 require (
 	github.com/a-h/templ v0.2.771
