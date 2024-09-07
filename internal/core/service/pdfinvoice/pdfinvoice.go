@@ -63,7 +63,7 @@ func (ig *InvoiceGenerator) BuildHTML(i models.InvoiceInput) bytes.Buffer {
 func (ig *InvoiceGenerator) GeneratePDF(filename string) {
 	// Eliminar el directorio 'generated/' del nombre del archivo
 	urlFilename := filepath.Base(filename)
-	url := fmt.Sprintf("http://localhost:3000/generated/%s", urlFilename)
+	url := fmt.Sprintf("http://localhost:3000/html-templates/%s", urlFilename)
 	fmt.Println(url)
 
 	var buf []byte
@@ -78,7 +78,7 @@ func (ig *InvoiceGenerator) GeneratePDF(filename string) {
 
 	err = ig.SavePDFToFile(filename, buf)
 	if err != nil {
-		fmt.Printf("Error al escribir el PDF en 'generated-pdf': %v", err)
+		fmt.Printf("Error al escribir el PDF en 'invoices': %v", err)
 		return
 	}
 
@@ -88,7 +88,7 @@ func (ig *InvoiceGenerator) GeneratePDF(filename string) {
 // Guardar el PDF en el directorio predeterminado
 func (ig *InvoiceGenerator) SavePDFToFile(filename string, pdfData []byte) error {
 	pdfFilename := filepath.Join(
-		"generated-pdf", fmt.Sprintf("invoice-%d.pdf", time.Now().UnixNano()),
+		"invoices", fmt.Sprintf("invoice-%d.pdf", time.Now().UnixNano()),
 	)
 
 	return os.WriteFile(pdfFilename, pdfData, 0644)

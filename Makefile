@@ -1,11 +1,5 @@
-server:
-	@go run cmd/server/server.go
-
-pdf:
-	@go run cmd/main.go
-
-brow:
-	@go run cmd/browser/browser.go
+run:
+	@go run cmd/api/main.go
 
 refresh:
 	@templ generate
@@ -15,13 +9,11 @@ build-css:
 
 .PHONY: build-css
 
-# Default target
-all: refresh  pdf
 
-.PHONY: all  refresh  pdf
+# Nuevo objetivo que incluye refresh, build-css y run
+dev: refresh build-css run
 
 
-# Nuevo objetivo que incluye refresh, build-css y brow
-dev: refresh build-css brow
-
+build:
+	go build -o bin cmd/api/main.go
 
