@@ -23,6 +23,14 @@
 # Archivos de caché
 .cache/
 
+# Ignorar el contenido de html-templates y invoices
+html-templates/*
+invoices/*
+
+#Manteniene las carpetas en el repositorio pero vacías:
+!html-templates/.gitkeep
+!invoices/.gitkeep
+
 # Otros
 *.bak
 *.zip
