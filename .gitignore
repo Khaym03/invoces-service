@@ -1,0 +1,29 @@
+# Directorios de dependencias
+/node_modules
+/vendor
+
+# Archivos de construcción
+/bin
+
+# Archivos de entorno
+.env
+.env.local
+.env.*.local
+
+# Archivos de registro
+*.log
+
+# Archivos temporales
+*.tmp
+*.swp
+
+# Archivos de IDE y editores
+.vscode/
+
+# Archivos de caché
+.cache/
+
+# Otros
+*.bak
+*.zip
+*.tar.gz
