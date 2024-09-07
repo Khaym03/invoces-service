@@ -7,6 +7,7 @@ require (
 	github.com/chromedp/cdproto v0.0.0-20240810084448-b931b754e476
 	github.com/chromedp/chromedp v0.10.0
 	github.com/gofiber/fiber/v2 v2.52.5
+	github.com/joho/godotenv v1.5.1
 )
 
 require (

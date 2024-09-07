@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Khaym03/invoces-service/internal/common"
 	"github.com/Khaym03/invoces-service/internal/components"
 	"github.com/Khaym03/invoces-service/internal/models"
 	"github.com/chromedp/cdproto/page"
@@ -61,9 +62,9 @@ func (ig *InvoiceGenerator) BuildHTML(i models.InvoiceInput) bytes.Buffer {
 }
 
 func (ig *InvoiceGenerator) GeneratePDF(filename string) {
-	// Eliminar el directorio 'generated/' del nombre del archivo
 	urlFilename := filepath.Base(filename)
-	url := fmt.Sprintf("http://localhost:3000/html-templates/%s", urlFilename)
+	port := common.Getenv("PORT", "2003")
+	url := fmt.Sprintf("http://localhost:%s/html-templates/%s", port, urlFilename)
 	fmt.Println(url)
 
 	var buf []byte

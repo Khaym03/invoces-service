@@ -4,10 +4,14 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/Khaym03/invoces-service/internal/common"
 	"github.com/Khaym03/invoces-service/internal/handlers"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+
+	// Read in .env on import
+	_ "github.com/joho/godotenv/autoload"
 )
 
 func main() {
@@ -24,7 +28,8 @@ func main() {
 
 	app.Post("/generate-invoice", handlers.GenerateInvoiceHandler)
 
-	app.Listen(":3000")
+	port := ":" + common.Getenv("PORT", "2003")
+	app.Listen(port)
 }
 
 func faviconMiddleware(c *fiber.Ctx) error {
