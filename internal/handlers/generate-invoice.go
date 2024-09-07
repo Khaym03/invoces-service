@@ -11,9 +11,17 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func GenerateInvoiceHandler(c *fiber.Ctx) error {
-	ig := pdfinvoice.Service()
+type handler struct {
+	InvoiceService *pdfinvoice.InvoiceGenerator
+}
 
+func Handler() *handler {
+	return &handler{
+		InvoiceService: pdfinvoice.Service(),
+	}
+}
+
+func (h *handler) GenerateInvoiceHandler(c *fiber.Ctx) error {
 	// Crear un nombre de archivo único para el HTML
 	htmlFilename := fmt.Sprintf("invoice-%d.html", time.Now().UnixNano())
 	htmlFilePath := filepath.Join("html-templates", htmlFilename)
@@ -29,14 +37,14 @@ func GenerateInvoiceHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear el directorio")
 	}
 
-	htmlContent := ig.BuildHTML(*invoice)
+	htmlContent := h.InvoiceService.BuildHTML(*invoice)
 
 	err = os.WriteFile(htmlFilePath, htmlContent.Bytes(), 0644)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString("Error al escribir el archivo")
 	}
 
-	go ig.GeneratePDF(htmlFilePath)
+	go h.InvoiceService.GeneratePDF(htmlFilePath)
 
 	fmt.Printf("Archivo HTML generado /%s\n", htmlFilename)
 

@@ -22,11 +22,13 @@ func main() {
 
 	rootDir, _ := os.Getwd()
 
+	apiHanlers := handlers.Handler()
+
 	app.Static("/assets", filepath.Join(rootDir, "assets"))
 	app.Static("/invoices", filepath.Join(rootDir, "invoices"))
 	app.Static("/html-templates", filepath.Join(rootDir, "html-templates"))
 
-	app.Post("/generate-invoice", handlers.GenerateInvoiceHandler)
+	app.Post("/generate-invoice", apiHanlers.GenerateInvoiceHandler)
 
 	port := ":" + common.Getenv("PORT", "2003")
 	app.Listen(port)
