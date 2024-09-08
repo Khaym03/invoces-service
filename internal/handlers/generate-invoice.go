@@ -15,9 +15,9 @@ type handler struct {
 	InvoiceService *pdfinvoice.InvoiceGenerator
 }
 
-func Handler() *handler {
+func Handler(pdfSrv *pdfinvoice.InvoiceGenerator) *handler {
 	return &handler{
-		InvoiceService: pdfinvoice.Service(),
+		InvoiceService: pdfSrv,
 	}
 }
 
@@ -44,7 +44,9 @@ func (h *handler) GenerateInvoiceHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString("Error al escribir el archivo")
 	}
 
-	go h.InvoiceService.GeneratePDF(htmlFilePath)
+	h.InvoiceService.EnqueuePDFGeneration(htmlFilePath)
+
+	//go h.InvoiceService.GeneratePDF(htmlFilePath)
 
 	fmt.Printf("Archivo HTML generado /%s\n", htmlFilename)
 

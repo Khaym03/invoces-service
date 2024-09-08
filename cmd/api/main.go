@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/Khaym03/invoces-service/internal/common"
+	"github.com/Khaym03/invoces-service/internal/core/service/pdfinvoice"
 	"github.com/Khaym03/invoces-service/internal/handlers"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
@@ -24,7 +25,11 @@ func main() {
 
 	rootDir, _ := os.Getwd()
 
-	apiHanlers := handlers.Handler()
+	pdfSrv := pdfinvoice.Service()
+	pdfSrv.InitContext()
+	defer pdfSrv.CloseContext()
+
+	apiHanlers := handlers.Handler(pdfSrv)
 
 	app.Static("/assets", filepath.Join(rootDir, "assets"))
 	app.Static("/invoices", filepath.Join(rootDir, "invoices"))
