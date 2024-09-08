@@ -1,6 +1,9 @@
 run:
 	@go run cmd/api/main.go
 
+email:
+	@go run cmd/email/main.go
+
 refresh:
 	@templ generate
 
