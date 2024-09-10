@@ -12,7 +12,6 @@ import (
 	"github.com/Khaym03/invoces-service/internal/common"
 	"github.com/Khaym03/invoces-service/internal/components"
 	"github.com/Khaym03/invoces-service/internal/core/ports"
-	"github.com/Khaym03/invoces-service/internal/core/service/emailsender"
 	"github.com/Khaym03/invoces-service/internal/models"
 	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/chromedp"
@@ -24,7 +23,6 @@ var once sync.Once
 func Service() *InvoiceGenerator {
 	once.Do(func() {
 		intance = &InvoiceGenerator{
-			Email:      emailsender.Service(),
 			PDFStorage: adapters.NewStoreLocally(),
 		}
 	})
@@ -37,7 +35,6 @@ type InvoiceGenerator struct {
 	queue      chan string
 	done       chan string
 	wg         sync.WaitGroup
-	Email      ports.EmailSender
 	PDFStorage ports.PDFStorage
 }
 

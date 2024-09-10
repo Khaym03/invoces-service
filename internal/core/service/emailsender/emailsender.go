@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"sync"
 
 	"net/smtp"
 
@@ -11,10 +12,16 @@ import (
 	"github.com/Khaym03/invoces-service/internal/models"
 )
 
+var once sync.Once
+var intance *emailsender
+
 type emailsender struct{}
 
 func Service() *emailsender {
-	return &emailsender{}
+	once.Do(func() {
+		intance = &emailsender{}
+	})
+	return intance
 }
 
 func (es *emailsender) Send(customer models.CustomerDetails, pdfURL string) error {
@@ -35,7 +42,7 @@ func (es *emailsender) Send(customer models.CustomerDetails, pdfURL string) erro
 
 	to := []string{customer.Email}
 	msg := []byte(formatt +
-		"Subject: Account Status\r\n" +
+		"Subject: Factura\r\n" +
 		"Content-Type: text/html; charset=UTF-8\r\n\r\n" + buf.String())
 
 	err := smtp.SendMail(hostname+":587", auth, laMediaDigitalEmail, to, msg)

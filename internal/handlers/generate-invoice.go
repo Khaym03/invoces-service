@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/Khaym03/invoces-service/internal/core/ports"
+	"github.com/Khaym03/invoces-service/internal/core/service/emailsender"
 	"github.com/Khaym03/invoces-service/internal/core/service/pdfinvoice"
 	"github.com/Khaym03/invoces-service/internal/models"
 	"github.com/gofiber/fiber/v2"
@@ -13,11 +15,13 @@ import (
 
 type handler struct {
 	InvoiceService *pdfinvoice.InvoiceGenerator
+	Email          ports.EmailSender
 }
 
 func Handler(pdfSrv *pdfinvoice.InvoiceGenerator) *handler {
 	return &handler{
 		InvoiceService: pdfSrv,
+		Email:          emailsender.Service(),
 	}
 }
 
@@ -45,10 +49,14 @@ func (h *handler) GenerateInvoiceHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString("Error al escribir el archivo")
 	}
 
-	filename := h.InvoiceService.WaitForPDFGeneration(fileName)
-	fmt.Printf("PDF generado: %s\n", filename)
+	pdfUrl := h.InvoiceService.WaitForPDFGeneration(fileName)
+	fmt.Printf("PDF generado: %s\n", pdfUrl)
 
-	return c.Status(fiber.StatusOK).SendString(filename)
+	if invoice.SendEmail {
+		go h.Email.Send(invoice.CustomerDetails, pdfUrl)
+	}
+
+	return c.Status(fiber.StatusOK).SendString(pdfUrl)
 }
 
 func decodeInvoiceRequest(c *fiber.Ctx) (*models.InvoiceInput, error) {
