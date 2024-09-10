@@ -4,16 +4,12 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+
 	"net/smtp"
 
 	"github.com/Khaym03/invoces-service/internal/components"
+	"github.com/Khaym03/invoces-service/internal/models"
 )
-
-// var (
-// 	from       = "gopher@example.net"
-// 	msg        = []byte("dummy message")
-// 	recipients = []string{"foo@example.com"}
-// )
 
 type emailsender struct{}
 
@@ -21,27 +17,31 @@ func Service() *emailsender {
 	return &emailsender{}
 }
 
-func (es *emailsender) Send() {
+func (es *emailsender) Send(customer models.CustomerDetails, pdfURL string) error {
 	hostname := "smtp.gmail.com"
-	user := "daniellarosa20003@gmail.com"
+	laMediaDigitalEmail := "daniellarosa20003@gmail.com"
 	password := "dxjbrigxfosjhnpy"
 
-	auth := smtp.PlainAuth("", user, password, hostname)
+	auth := smtp.PlainAuth("", laMediaDigitalEmail, password, hostname)
 
 	var buf bytes.Buffer
 
-	comp := components.Header("pepe")
+	comp := components.Header("pepe", pdfURL)
 	comp.Render(context.Background(), &buf)
 
 	fmt.Println(buf.String())
 
-	to := []string{user}
-	msg := []byte("To: daniellarosa20003@gmail.com\r\n" +
+	formatt := fmt.Sprintf("To: %s\r\n", customer.Email)
+
+	to := []string{customer.Email}
+	msg := []byte(formatt +
 		"Subject: Account Status\r\n" +
 		"Content-Type: text/html; charset=UTF-8\r\n\r\n" + buf.String())
 
-	err := smtp.SendMail(hostname+":587", auth, user, to, msg)
+	err := smtp.SendMail(hostname+":587", auth, laMediaDigitalEmail, to, msg)
 	if err != nil {
 		panic(err)
 	}
+
+	return nil
 }

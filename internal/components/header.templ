@@ -1,5 +1,6 @@
 package components
 
-templ Header(name string) {
-	<h1>Hello, { name }</h1>
+templ Header(name, url string) {
+	<p>Hey buddy aqui esta tu factura</p>
+	<a href={templ.SafeURL(url)} target="_blank">Link a tu factura</a>
 }

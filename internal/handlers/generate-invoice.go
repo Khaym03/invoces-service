@@ -23,7 +23,8 @@ func Handler(pdfSrv *pdfinvoice.InvoiceGenerator) *handler {
 
 func (h *handler) GenerateInvoiceHandler(c *fiber.Ctx) error {
 	// Crear un nombre de archivo único para el HTML
-	htmlFilename := fmt.Sprintf("invoice-%d.html", time.Now().UnixNano())
+	fileName := fmt.Sprintf("invoice-%d", time.Now().UnixNano())
+	htmlFilename := fileName + ".html"
 	htmlFilePath := filepath.Join("html-templates", htmlFilename)
 
 	invoice, err := decodeInvoiceRequest(c)
@@ -44,13 +45,10 @@ func (h *handler) GenerateInvoiceHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString("Error al escribir el archivo")
 	}
 
-	h.InvoiceService.EnqueuePDFGeneration(htmlFilePath)
+	filename := h.InvoiceService.WaitForPDFGeneration(fileName)
+	fmt.Printf("PDF generado: %s\n", filename)
 
-	//go h.InvoiceService.GeneratePDF(htmlFilePath)
-
-	fmt.Printf("Archivo HTML generado /%s\n", htmlFilename)
-
-	return c.Status(fiber.StatusOK).SendString(fmt.Sprintf("Archivo HTML generado /%s\n", htmlFilename))
+	return c.Status(fiber.StatusOK).SendString(filename)
 }
 
 func decodeInvoiceRequest(c *fiber.Ctx) (*models.InvoiceInput, error) {

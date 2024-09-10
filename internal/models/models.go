@@ -19,6 +19,7 @@ type CustomerDetails struct {
 type InvoiceInput struct {
 	InvoiceDetails  InvoiceDetails  `json:"invoice_details"`
 	CustomerDetails CustomerDetails `json:"customer_details"`
+	SendEmail       bool            `json:"send_email"`
 }
 
 func (i *InvoiceInput) Format() {}

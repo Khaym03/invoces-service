@@ -5,13 +5,14 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
-	"path/filepath"
 	"sync"
 	"time"
 
+	adapters "github.com/Khaym03/invoces-service/internal/adapters/pdfstorage"
 	"github.com/Khaym03/invoces-service/internal/common"
 	"github.com/Khaym03/invoces-service/internal/components"
+	"github.com/Khaym03/invoces-service/internal/core/ports"
+	"github.com/Khaym03/invoces-service/internal/core/service/emailsender"
 	"github.com/Khaym03/invoces-service/internal/models"
 	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/chromedp"
@@ -22,16 +23,22 @@ var once sync.Once
 
 func Service() *InvoiceGenerator {
 	once.Do(func() {
-		intance = &InvoiceGenerator{}
+		intance = &InvoiceGenerator{
+			Email:      emailsender.Service(),
+			PDFStorage: adapters.NewStoreLocally(),
+		}
 	})
 	return intance
 }
 
 type InvoiceGenerator struct {
-	ctx    context.Context
-	cancel context.CancelFunc
-	queue  chan string
-	wg     sync.WaitGroup
+	ctx        context.Context
+	cancel     context.CancelFunc
+	queue      chan string
+	done       chan string
+	wg         sync.WaitGroup
+	Email      ports.EmailSender
+	PDFStorage ports.PDFStorage
 }
 
 func (ig *InvoiceGenerator) InitContext() {
@@ -45,6 +52,7 @@ func (ig *InvoiceGenerator) InitContext() {
 		execAllocator, _ := chromedp.NewExecAllocator(context.Background(), opts...)
 		ig.ctx, ig.cancel = chromedp.NewContext(execAllocator)
 		ig.queue = make(chan string, 100) // Tamaño de la cola
+		ig.done = make(chan string, 100)
 		ig.startWorker()
 	}
 }
@@ -62,7 +70,8 @@ func (ig *InvoiceGenerator) startWorker() {
 	go func() {
 		defer ig.wg.Done()
 		for filename := range ig.queue {
-			ig.GeneratePDF(filename, time.Now())
+			pdfUrl := ig.GeneratePDF(filename, time.Now())
+			ig.done <- pdfUrl
 		}
 	}()
 }
@@ -100,10 +109,11 @@ func (ig *InvoiceGenerator) BuildHTML(i models.InvoiceInput) bytes.Buffer {
 	return buf
 }
 
-func (ig *InvoiceGenerator) GeneratePDF(filename string, slapse time.Time) {
-	urlFilename := filepath.Base(filename)
+func (ig *InvoiceGenerator) GeneratePDF(fileName string, slapse time.Time) string {
+	htmlFile := fileName + ".html"
 	port := common.Getenv("PORT", "2003")
-	url := fmt.Sprintf("http://localhost:%s/html-templates/%s", port, urlFilename)
+	url := fmt.Sprintf("http://localhost:%s/html-templates/%s", port, htmlFile)
+	pdfName := fileName + ".pdf"
 	fmt.Println(url)
 
 	var buf []byte
@@ -111,30 +121,25 @@ func (ig *InvoiceGenerator) GeneratePDF(filename string, slapse time.Time) {
 	err := chromedp.Run(ig.ctx, ig.GeneratePDFFromURL(url, &buf))
 	if err != nil {
 		log.Printf("Error generating PDF: %v", err)
-		return
+		return ""
 	}
 
-	err = ig.SavePDFToFile(filename, buf)
+	pdfUrl, err := ig.PDFStorage.Save(pdfName, buf)
 	if err != nil {
 		log.Printf("Error saving PDF: %v", err)
-		return
+		return ""
 	}
 
 	fmt.Println(time.Since(slapse))
-}
 
-// Guardar el PDF en el directorio predeterminado
-func (ig *InvoiceGenerator) SavePDFToFile(filename string, pdfData []byte) error {
-	pdfName := fmt.Sprintf("invoice-%d.pdf", time.Now().UnixNano())
-	pdfFilename := filepath.Join(
-		"invoices", pdfName,
-	)
-
-	fmt.Println("PDF guardardo ", pdfName)
-
-	return os.WriteFile(pdfFilename, pdfData, 0644)
+	return pdfUrl
 }
 
 func (ig *InvoiceGenerator) EnqueuePDFGeneration(filename string) {
 	ig.queue <- filename
+}
+
+func (ig *InvoiceGenerator) WaitForPDFGeneration(filename string) string {
+	ig.EnqueuePDFGeneration(filename)
+	return <-ig.done
 }
