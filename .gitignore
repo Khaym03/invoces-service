@@ -4,6 +4,7 @@
 
 # Archivos de construcción
 /bin
+/tmp
 
 # Archivos de entorno
 .env
