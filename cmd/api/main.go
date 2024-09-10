@@ -36,6 +36,7 @@ func main() {
 	app.Static("/html-templates", filepath.Join(rootDir, "html-templates"))
 
 	app.Post("/generate-invoice", apiHanlers.GenerateInvoiceHandler)
+	app.Get("/list-invoices", apiHanlers.ListInvoices)
 
 	port := ":" + common.Getenv("PORT", "2003")
 	app.Listen(port)
